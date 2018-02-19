@@ -7,12 +7,13 @@ import App from './App'
 import router from './router'
 import '@/assets/less/layout.less'
 import './element-variables.scss'
+import '../theme/index.css'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 
 /* eslint-disable no-new */
-new Vue({
+var vm = new Vue({
   el: '#app',
   router,
   components: { App },

@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: 'Menu',
+  name: 'Header',
   data () {
     return {
       msg: ''

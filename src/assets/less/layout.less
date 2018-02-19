@@ -7,10 +7,23 @@
 .p10{padding:10px;}
 .p15{padding:15px;}
 .p20{padding:20px;}
-.ml30{margin-left:30px;}
+.ml_30{margin-left:30px;}
 .pl5em{padding-left:5em;}
-.pt10{padding-top:10px;}
-.pr5{padding-right: 5px;}
+.pt_10{padding-top:10px;}
+.pr_5{padding-right: 5px;}
+.ml_5{margin-left: 5px;}
+.ml_10{margin-left: 10px;}
+.ml_15{margin-left: 15px;}
+.ml_20{margin-left: 20px;}
+.ml_25{margin-left: 25px;}
+.ml_30{margin-left: 30px;}
+.ml_60{margin-left: 60px;}
+.mr_5{margin-right: 5px;}
+.mr_10{margin-right: 10px;}
+.mr_15{margin-right: 15px;}
+.mr_20{margin-right: 20px;}
+.mr_25{margin-right: 25px;}
+.mr_30{margin-right: 30px;}
 
 .fz12{
     font-size:12px;
@@ -20,11 +33,15 @@
 }
 
 a,a:link {
-    color: #409eff;
+    color: #3e868f;
 }
 a:hover {
-    color: #f60;
+    color: #279baa;
     text-decoration:underline;
+}
+
+.hide{
+    display: none;
 }
 
 [class*=" icon-"],[class^=icon-] {
@@ -43,10 +60,23 @@ a:hover {
     width: 1000px;
     margin: 0 auto;
 }
+.box-con{
+    border: 1px solid #ebebeb;
+    min-height: 500px;
+    margin-top: 20px;
+    padding-bottom: 100px;
+}
 .register-ruleForm{
     .el-input{
         float: left;
         width: 200px;
+        .el-input__inner{
+            // height: 30px;
+        }
+    }
+
+    .el-form-item.is-required .el-form-item__label:before{
+        content: '';
     }
     .explain{
         float: left;
@@ -65,7 +95,50 @@ a:hover {
     }
     .el-checkbox__label{
         margin-left: 10px;
-        color: #cccccc;
+        color: #cccccc !important;
         margin-bottom: 22px;
+    }
+}
+.login{
+    .el-input{
+        width: 250px;
+        float: left;
+    }
+    .el-form-item__error{
+        left: 200px;
+    }
+    .el-form-item__label{
+        width: 200px;
+        text-align: right;
+    }
+}
+.forget{
+    .el-tabs__header{
+        margin-left: 120px;
+        .el-tabs__item{
+            width: 150px;
+        }
+        .el-tabs__active-bar{
+            width: 150px !important;
+            height: 12px;
+            background: url(../../assets/img/icon4.png) no-repeat;
+        }
+    }
+    .el-form-item{
+        .el-input{
+            float: left;
+        }
+        .el-form-item__label{
+            padding-right: 0px;
+        }
+        .imgCode{
+            width: 98px;
+            height: 40px;
+            margin-left: 20px;
+            float: left;
+        }
+        .el-button--primary{
+            width: 300px;
+        }
     }
 }
