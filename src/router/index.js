@@ -10,6 +10,16 @@ import payAndSell from '@/views/notice/payAndSell.vue'
 import apply from '@/views/notice/apply.vue'
 import index from '@/views/index/index.vue'
 import home from '@/views/index/home.vue'
+import user_index from '@/views/myMeans/user_index.vue'
+import coinname from '@/views/myMeans/coinname.vue'
+import record from '@/views/myMeans/record.vue'
+import delegation from '@/views/myMeans/delegation.vue'
+import my_order from '@/views/myMeans/my_order.vue'
+import securitys from '@/views/myMeans/securitys.vue'
+import affirm from '@/views/myMeans/affirm.vue'
+import realName from '@/views/myMeans/realName.vue'
+import syslist from '@/views/myMeans/syslist.vue'
+import updatePsw from '@/views/myMeans/updatePsw.vue'
 
 Vue.use(Router)
 
@@ -64,6 +74,56 @@ export default new Router({
       path: '/home',
       name: 'home',
       component: home
+    },
+    {
+      path: '/user_index',
+      name: 'user_index',
+      component: user_index
+    },
+    {
+      path: '/coinname',
+      name: 'coinname',
+      component: coinname
+    },
+    {
+      path: '/record',
+      name: 'record',
+      component: record
+    },
+    {
+      path: '/delegation',
+      name: 'delegation',
+      component: delegation
+    },
+    {
+      path: '/my_order',
+      name: 'my_order',
+      component: my_order
+    },
+    {
+      path: '/securitys',
+      name: 'securitys',
+      component: securitys
+    },
+    {
+      path: '/affirm',
+      name: 'affirm',
+      component: affirm
+    },
+    {
+      path: '/realName',
+      name: 'realName',
+      component: realName
+    },
+    {
+      path: '/syslist',
+      name: 'syslist',
+      component: syslist
+    },
+    {
+      path: '/updatePsw',
+      name: 'updatePsw',
+      component: updatePsw
     }
   ]
 })

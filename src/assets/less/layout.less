@@ -10,10 +10,15 @@
 .ml_30{margin-left:30px;}
 .pl5em{padding-left:5em;}
 .pt_10{padding-top:10px;}
+.pt_20{padding-top:20px;}
 .pr_5{padding-right: 5px;}
 .ml_5{margin-left: 5px;}
+.mb_5{margin-bottom: 5px;}
+.mt_5{margin-top: 5px;}
 .ml_10{margin-left: 10px;}
+.mb_10{margin-bottom: 10px;}
 .ml_15{margin-left: 15px;}
+.mt_15{margin-top: 15px;}
 .ml_20{margin-left: 20px;}
 .ml_25{margin-left: 25px;}
 .ml_30{margin-left: 30px;}
@@ -140,5 +145,27 @@ a:hover {
         .el-button--primary{
             width: 300px;
         }
+    }
+}
+.blackTable {
+    .el-table{border: 1px solid #efefef;}
+    .el-table td, .el-table th{padding: 3px 0;}
+    .el-table thead tr th{background: #2e2e2e;color: #fff;}
+    &.auto{
+        .el-table__body-wrapper{
+            overflow-y: auto;
+        }
+    }
+    &.user_index{
+        .el-table td, .el-table th{padding: 7px 0;}
+    }
+}
+.delegation{
+    .el-input__inner{
+        font-size: 12px;
+        height: 24px;
+    }
+    .el-input--suffix .el-input__inner{
+        padding-right: 0px;
     }
 }
