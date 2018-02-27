@@ -70,8 +70,134 @@
             }
             
         },
+        sockets: {
+            connect() {
+                console.log('socket connected');
+            }
+        },
         created(){
             // this.$store.dispatch("loginFailure")
+            const jwt = require('jsonwebtoken');
+            const _ = require('lodash');
+
+            const sleep = function (t) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, t);
+                })
+            }
+            const user = {
+                email: 'boyce.zheng@lingxi.co',
+                _id: '5a643c4ae75c051f3511a294',
+                group: '589802a84f13fa6973655bac',
+                name: 'boyce'
+            }
+
+            const user_info_register = {
+                path: '/user/info/register',
+                body: {
+                    email: 'bbbbbb@12.com',
+                    loginPassword: '123456',
+                    country: '中国',
+                    inviteCode: '123456'
+                }
+            }
+            const user_certification_identify = {
+                path: '/user/certification/identify',
+                body: {
+                    name: 'boyce',
+                    type: '身份证',
+                    id: '330124198605282231',
+                    phone: '15000095455',
+                    code: '408839'
+                }
+            }
+
+            const user_password_register = {
+                path: '/user/password/register',
+                body: {
+                    tradePassword: '123456',
+                }
+            }
+
+            class Client {
+
+                constructor() {
+                    this.host = 'http://dev.auth.wanbiwang.com';
+                }
+
+                /**
+                * 权限验证，获得MC地址
+                */
+                auth() {
+                    this.auth_server = require('socket.io-client')(this.host);
+                    this.auth_server.on('connect', () => {
+                        jwt.sign(user, 'lingxi', { expiresIn: '7d' }, (err, token) => {
+                            debugger
+                            this.auth_server.emit('auth', { path: '/user/login', body: { jwt: token } }, (msg) => {
+                                console.log(msg,2);
+                                this.login(msg.body);
+                            });
+                        });
+                    });
+
+                }
+
+                /**
+                 * 登陆至MC服务器
+                 * @param {any} msg     权限服务器返回的消息队列
+                 * @returns 
+                 */
+                login(msg) {
+                    if (_.get(msg, 'error') || !_.get(msg, 'mc')) {
+                        return console.error(msg.error);
+                    }
+                    this.mc = msg.mc;
+                    this.jwt = msg.jwt;
+                    this.client = require('socket.io-client')(this.mc);
+                    this.client.on('connect', () => {
+                        this.client.emit('user', { path: '/user/login', body: { jwt: this.jwt } }, (msg) => console.log(msg,1));
+                        this.auth_server.close();
+                        this.task();
+                    });
+                }
+
+                async task(i) {
+                    const user_test = {
+                        path: '/user/test',
+                        body: {
+                            email: 'bbbbbb@12.com',
+                            password: '123456',
+                            name: 'boyce'
+                        }
+                    }
+
+                    const captcha_get = {
+                        path: '/captcha/get',
+                        body: {}
+                    }
+                    const captcha_test = {
+                        path: '/captcha/test',
+                        body: { accountId: '123' }
+                    }
+                    this.client.emit('msg', captcha_test, (msg) => {
+                    });
+                }
+            }
+
+            const client = new Client();
+            client.auth();
+            (async () => {
+                await sleep(5000);
+                console.time('client');
+                for (var i = 0; i < 3; ++i) {
+                    await sleep(Math.ceil(Math.random() * 2));
+                    client.task(i);
+                }
+                console.timeEnd('client');
+            })();
+
         },
         methods: {}
     }

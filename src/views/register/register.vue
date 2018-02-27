@@ -24,22 +24,38 @@
                 <div class="componentForm">
                     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="390px" class="register-ruleForm register-ruleForm-email" v-bind:class="{hide:register1}">
                         <el-form-item label="国家：" prop="name">
-                            <el-input v-model="ruleForm.name"></el-input>
+                            <!-- <el-input v-model="ruleForm.name"></el-input> -->
+                            <div class="intl-tel-input el-input inside" style="width: 200px; float: left;">
+                                <input class="el-input__inner" style="padding-left:44px;" v-model="ruleForm.country" type="text" readonly="">
+                                <div class="flag-dropdown" @click="countryList()">
+                                    <div class="selected-flag" title="China (中国): +86">
+                                        <div class="flag " :class="sn">
+                                            <div class="arrow" :class="{up:isUp}"></div>
+                                        </div>
+                                    </div>
+                                    <ul class="country-list" :class="{hide:isCountryList}">
+                                        <li data-dial-name="China (中国)" @click="countryClick('China (中国)','cn')" class="country preferred active" data-dial-code="86" data-country-code="cn">
+                                            <div class="flag cn"></div><span class="country-name">China (中国)</span><span class="dial-code">+86</span></li>
+                                        <li data-dial-name="United Kingdom" @click="countryClick('United Kingdom','gb')" class="country preferred" data-dial-code="44" data-country-code="gb">
+                                            <div class="flag gb"></div><span class="country-name">United Kingdom</span><span class="dial-code">+44</span></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </el-form-item>
                          <el-form-item label="电子邮箱：" prop="email">
                             <el-input style="width:200px;float:left;" v-model="ruleForm.email"></el-input>
                             <span class="explain">请输入您的电子邮箱，用于登录和找回密码</span>
                         </el-form-item>
-                         <el-form-item label="登陆密码：" prop="pass">
-                            <el-input type="password" v-model="ruleForm.pass"></el-input>
+                         <el-form-item label="登陆密码：" prop="loginPassword">
+                            <el-input type="password" v-model="ruleForm.loginPassword"></el-input>
                             <span class="explain">密码长度6-20位</span>
                         </el-form-item>
                          <el-form-item label="重复密码：" prop="checkPass">
                             <el-input type="password" v-model="ruleForm.checkPass"></el-input>
                             <span class="explain">重复输入密码，两次需一致</span>
                         </el-form-item>
-                         <el-form-item label="邀请码：" prop="codeInvite">
-                            <el-input v-model="ruleForm.codeInvite"></el-input>
+                         <el-form-item label="邀请码：" prop="inviteCode">
+                            <el-input v-model="ruleForm.inviteCode"></el-input>
                             <span class="explainChange">选填项</span>
                         </el-form-item>
                         <el-form-item>
@@ -75,7 +91,7 @@
                          <el-form-item label="证件类型:" prop="checkPass">
                             <el-select class="fl" v-model="ruleForm3.idName" placeholder="身份证">
                                 <el-option
-                                v-for="item in ruleForm3.idNameList"
+                                v-for="item in idNameList"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
@@ -92,16 +108,17 @@
                         </el-form-item>
                          <el-form-item label="图形验证码: " prop="imgCode">
                             <el-input v-model="ruleForm3.imgCode" style="width: 100px;"></el-input>
-                            <img v-bind:src="imgCode" alt="" class="imgCode" @click="imgCodeClick()">
+                            <img v-bind:src="imgUrl" alt="" class="imgCode" @click="__captcha__get()">
                         </el-form-item>
                          <el-form-item label="验证码: " prop="msgCode">
                             <el-input v-model="ruleForm3.msgCode" style="width: 100px;"></el-input>
                             <a href="javascript:;" class="code" @click="phoneCodeClick()">{{phoneCode}}</a>
                         </el-form-item>
                         <el-form-item>
-                            <el-button class="fl" style="width:200px;" type="primary" @click="nextTwo('ruleForm3')">下一步</el-button>
+                            <el-button class="fl" style="width:200px;" type="primary" @click="nextThree('ruleForm3')">下一步</el-button>
                         </el-form-item>
                     </el-form>
+                    <p :class="{hide:register4}">恭喜您，注册完成！</p>
                 </div>
             </div>
         </div>
@@ -129,11 +146,11 @@
             };
             var validatePass2 = (rule, value, callback) => {
                 if (value === '') {
-                callback(new Error('请再次输入密码'));
-                } else if (value !== this.ruleForm.pass) {
-                callback(new Error('两次输入密码不一致!'));
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.ruleForm.loginPassword) {
+                    callback(new Error('两次输入密码不一致!'));
                 } else {
-                callback();
+                    callback();
                 }
             };
             var validatePass4 = (rule, value, callback) => {
@@ -179,23 +196,10 @@
                 if (value === '') {
                     callback(new Error('请输入图片验证码'));
                 } else {
-                    if (!/^[0-9]{4}$/.test(value)) {
+                    if (value.length!==6) {
                         callback(new Error('请输入正确的图片验证码'));
                     }else{
-                        this.$ajax({
-                            url:'/code/validate',
-                            data:{
-                                randoms:this.random,
-                                value:this.ruleRegister.randoms,
-                            },
-                            async:false,
-                            success:() => {
-                                callback()
-                            },
-                            error:() => {
-                                callback(new Error('请输入正确的图片验证码'))
-                            }
-                        })
+                        callback()
                     }
                 }
             };
@@ -206,29 +210,13 @@
                     if (!/^[0-9]{6}$/.test(value)) {
                         callback(new Error('请输入正确的短信验证码'));
                     }else{
-                        if(!this.checkSmsCode){
-                            this.$ajax({
-                                url:'/code/validateSmsCode',
-                                data:{
-                                    telephone:this.ruleRegister.telephone,
-                                    code:this.ruleRegister.smsCode
-                                },
-                                async:false,
-                                success:() => {
-                                    this.checkSmsCode = true
-                                    callback()
-                                },
-                                error:() => {
-                                    callback(new Error('请输入正确的短信验证码'))
-                                }
-                            })
-                        }else {
-                            callback()
-                        }
+                        callback()
                     }
                 }
             };
             return {
+                isUp:false,
+                isCountryList:true,
                 phoneCode: '获取短信验证码',
                 checked: true,
                 isActive2: false,
@@ -241,30 +229,23 @@
                 guideList: 0,
                 imgCode:'',
                 ruleForm: {
-                    country: '',
-                    email: '1111@qq.com',
-                    pass: '111111',
+                    country: 'China (中国)',
+                    email: '1111232@qq.com',
+                    loginPassword: '111111',
                     checkPass: '111111',
-                    codeInvite: ''
+                    inviteCode: ''
                 },
                 rules: {
-                    country: [
-                        { required: true, message: '请输入活动名称', trigger: 'blur' },
-                        { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-                    ],
                     email: [
                         { required: true, message: '请输入邮箱地址', trigger: 'blur' },
                         { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
                     ],
-                    pass: [
+                    loginPassword: [
                         { validator: validatePass, trigger: 'blur' },
                         { min: 6, max: 20, message: '密码长度6-20位', trigger: 'blur' }
                     ],
                     checkPass: [
                         { validator: validatePass2, trigger: 'blur' }
-                    ],
-                    desc: [
-                        { required: true, message: '请填写活动形式', trigger: 'blur' }
                     ]
                 },
                 ruleForm2: {
@@ -280,28 +261,31 @@
                         { validator: validatePass3, trigger: 'blur' }
                     ]
                 },
+                idNameList: [
+                    {
+                        value: '身份证',
+                        label: '身份证'
+                    },
+                    {
+                        value: '护照',
+                        label: '护照'
+                    }
+                ],
                 ruleForm3: {
-                    name: '',
-                    idName: '',
-                    idNameList: [
-                        {
-                            value: '身份证',
-                            label: '身份证'
-                        },
-                        {
-                            value: '护照',
-                            label: '护照'
-                        }
-                    ],
-                    card:'',
-                    phone:'',
-                    imgCode:'',
-                    msgCode:''
+                    name: '123',
+                    idName: '身份证',
+                    card:'123456789012345678',
+                    phone:'13083989685',
+                    imgCode:'123qwe',
+                    captcha:'',
+                    msgCode:'123123'
                 },
+                imgUrl:'',
+                sn:'cn',
                 rules3: {
                     name: [
                         { required: true, message: '请输入真实姓名', trigger: 'blur' },
-                        { min: 2, max: 20, message: '真实姓名长度6-20位', trigger: 'blur' }
+                        { min: 2, max: 20, message: '真实姓名长度2-20位', trigger: 'blur' }
                     ],
                     card: [
                         { validator: card, trigger: 'blur' }
@@ -315,10 +299,22 @@
                     msgCode: [
                         { validator: checkSmsCode, trigger: 'blur' }
                     ]
-                }
+                },
+                auth_server:''
+            }
+        },
+        sockets: {
+            connect() {
+                console.log('socket connected');
+            },
+            customEmit: function(val){
+                console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
             }
         },
         created(){
+            // this.guideList = 2;
+            // this.__captcha__get();
+            console.log(this.idNameList);
         },
         watch: {
             guideList: function (val, oldVal) {
@@ -365,13 +361,47 @@
             }
         },
         methods: {
+            countryList:function(){
+                this.isUp = !this.isUp;
+                this.isCountryList = !this.isCountryList;
+            },
+            countryClick:function(data,sn){
+                this.ruleForm.country = data;
+                this.sn = sn;
+            },
             txtCheckbox:function(data){
                 this.checked = data;
             },
+            login:function(msg){
+                var _this = this;
+                this.auth_server = require('socket.io-client')(msg.mc);
+                this.auth_server.emit('user', { path: '/user/login', body: {jwt:msg.jwt} }, (msg) => {
+                    console.log('登录成功！',msg);
+                    if(msg.error){
+                        this.$message.error({
+                            message: msg.error
+                        });
+                    }else{
+                        _this.guideList = 1;
+                    }
+                });
+            },
             nextOne:function(formName){
+                var _this = this;
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.guideList = 1;
+                        this.$socket.emit('auth', { path: '/user/info/register', body: this.ruleForm }, (msg) => {
+                            console.log(msg);
+                            if(msg.error){
+                                this.$message.error({
+                                    message: msg.error
+                                });
+                            }else{
+                                let body = msg.body;
+                                console.log('注册成功！+ - > body:',body);
+                                _this.login(body);
+                            }
+                        });
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -382,38 +412,98 @@
             nextTwo:function(formName){
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.guideList = 2;
+                        this.auth_server.emit('msg', { path: '/user/password/register', body: {tradePassword:this.ruleForm2.passJy} }, (msg) => {
+                            console.log(msg);
+                            if(msg.error){
+                                this.$message.error({
+                                    message: msg.error
+                                });
+                                this.guideList = 2;
+                            }else{
+                                let body = msg.body;
+                                console.log(body,'交易成功！')
+                                this.guideList = 2;
+                                this.__captcha__get();
+                            }
+                        });
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
+            },
+            //获取图片验证码
+            __captcha__get:function(){
+                let _this = this;
+                this.$api.__captcha__get({},
+                    (msg) => {
+                        console.log('获取图片验证码',msg);
+                        _this.imgUrl = msg.url;
+                        _this.ruleForm3.captcha = msg.captcha;
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
             },
             nextThree:function(formName){
+                let {name,idName,card,phone,msgCode,imgCode,captcha} = this.ruleForm3;
+                let param = {
+                    name:name,            // 真实姓名
+                    type:idName,            // 证件类型
+                    id:card,              // 证件号码
+                    phone:phone,           // 手机号码
+                    code:msgCode,            // 短信验证码
+                    captcha:captcha,         // 获取图形验证码时候的captcha字段
+                    value:imgCode               // 用户输入的图形验证码
+                }
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.guideList = 3;
+                        this.auth_server.emit('msg', { path: '/user/certification/identify', body: param }, (msg) => {
+                            console.log(msg);
+                            if(msg.error){
+                                this.$message.error({
+                                    message: msg.error
+                                });
+                            }else{
+                                let body = msg.body;
+                                console.log(body,'注册全部完成')
+                                this.guideList = 3;
+                            }
+                        });
+                        // this.guideList = 3;
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
             },
-            imgCodeClick() {
-                this.random = Math.random();
-                this.imgCode = '/code/generator?randoms='+this.random;
+            __sms__get:function(phone){
+                let _this = this;
+                this.$api.__sms__get({phone:phone},
+                    (msg) => {
+                        console.log('获取短信验证码',msg);
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
             },
             phoneCodeClick(){
                 let time = 60;
                 let _this = this;
-                if(!this.$filter.phone(this.ruleRegister.telephone)) {
+                if(!this.$filter.phone(this.ruleForm3.phone)) {
                     this.$message.error({
                         message: '请输入正确手机号'
                     });
                     return false;
                 }
-                var param = {telephone:this.ruleRegister.telephone}
-                this.$api.generatorSmsCode({param},
+                var param = {phone:this.ruleForm3.phone}
+                this.$api.__sms__get(param,
                     () => {
                         let time = 60;
                         _this.phoneCode = time;
@@ -428,7 +518,7 @@
                     },
                     err => {
                         this.$message.error({
-                            message: err.errorMessage
+                            message: err.error
                         });
                     }
                 );
@@ -517,6 +607,94 @@
             float:left;
             margin-left:10px;
             // margin-top: 5px;
+        }
+    }
+    .intl-tel-input {
+        position: relative;
+        display: inline-block;
+        .flag-dropdown {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            cursor: pointer;
+            &:hover{
+                .selected-flag {
+                    background-color: rgba(0,0,0,0.05)
+                }
+            }
+        }
+        .flag {
+            margin-top: -5px;
+            width: 16px;
+            height: 11px;
+            display: inline-block;
+            background: url("../../assets/img/flags.png");
+            &.cn {
+                background-position: -128px -177px;
+            }
+            &.gb {
+                background-position: -176px -22px;
+            }
+        }
+        .selected-flag {
+            z-index: 1;
+            position: relative;
+            width: 38px;
+            height: 100%;
+            padding: 0 8px 0 0;
+            .arrow {
+                position: relative;
+                top: 50%;
+                margin-top: -2px;
+                left: 20px;
+                width: 0;
+                height: 0;
+                border-left: 3px solid transparent;
+                border-right: 3px solid transparent;
+                border-top: 4px solid #555;
+                &.up {
+                    border-top: none;
+                    border-bottom: 4px solid #555
+                }
+            }
+        }
+        .country-list {
+            text-align: left;
+            list-style: none;
+            position: absolute;
+            z-index: 2;
+            padding: 0;
+            margin: 0 0 0 -1px;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+            background-color: white;
+            border: 1px solid #ccc;
+            width: 430px;
+            max-height: 200px;
+            overflow-y: scroll;
+            .divider {
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+                border-bottom: 1px solid #ccc
+            }
+            .flag{
+                margin-right: 6px;
+                &.gb {
+                    background-position: -176px -22px;
+                }
+            }
+            .country {
+                line-height: 11px;
+                padding: 7px 10px;
+                .dial-code {
+                    color: #999
+                }
+                &:hover{
+                    background-color: rgba(0,0,0,0.05)
+                }
+            }
+            .country-name {
+                margin-right: 6px;
+            }
         }
     }
 </style>

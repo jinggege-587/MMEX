@@ -24,10 +24,23 @@
 			</div>
 			<div class="fr menuTop">
                 <ul>
-                    <li><a href="">交易中心</a></li>
-                    <li><a href="">公告中心</a></li>
-                    <li class="icon"><a href="">我的账户</a></li>
-                    <li><a href="">最新活动</a></li>
+                    <li><a href="#/home">交易中心</a></li>
+                    <li><a href="#/dynamic">公告中心</a></li>
+                    <li class="icon">
+                        <a href="javascript:;">我的账户</a>
+                        <dl>
+                            <dt><a href="#/user_index/">账户资产</a></dt>
+                            <dt><a href="#/record">充提记录</a></dt>
+                            <dt><a href="#/delegation/">委托管理</a></dt>
+                            <dt><a href="#/my_order/">我的成交</a></dt>
+                            <dt><a href="#/securitys/">安全中心</a></dt>
+                            <dt><a href="#/realName/">实名认证</a></dt>
+                            <dt><a href="#/affirm/">双重认证</a></dt>
+                            <dt><a href="#/updatePsw/">修改密码</a></dt>
+                            <dt><a href="#/syslist/">系统消息</a></dt>
+                        </dl>
+                    </li>
+                    <li><a href="#/dynamic">最新活动</a></li>
                 </ul>
 			</div>
 		</div>
@@ -77,6 +90,38 @@ export default {
                     }
                     &.icon{
                         background: url(../assets/img/icon5.png) no-repeat right;
+                        position: relative;
+                        dl{
+                            display: none;
+                            position: absolute;
+                            z-index: 9;
+                            background: #fff;
+                            top: 30px;
+                            left: 12px;
+                            border: 1px solid #eaeaea;
+                            dt{
+                                width: 100px;
+                                a{
+                                    height: 26px;
+                                    line-height: 26px;
+                                    font-size: 12px;
+                                    width: 70px;
+                                    text-align: center;
+                                    display: block;
+                                }
+                                &:hover{
+                                    background: #3e868f;
+                                    a{
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                        &:hover{
+                            dl{
+                                display: block;
+                            }
+                        }
                     }
                 }
             }
