@@ -374,6 +374,7 @@
             },
             login:function(msg){
                 var _this = this;
+                localStorage.host = msg.mc;
                 this.auth_server = require('socket.io-client')(msg.mc);
                 this.auth_server.emit('user', { path: '/user/login', body: {jwt:msg.jwt} }, (msg) => {
                     console.log('登录成功！',msg);
