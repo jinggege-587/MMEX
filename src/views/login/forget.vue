@@ -14,11 +14,11 @@
                                     <el-input v-model="formForget.email"></el-input>
                                 </el-form-item>
                                 <el-form-item label="验证码：">
-                                    <el-input v-model="formForget.code" style="width:180px;"></el-input>
+                                    <el-input v-model="formForget.value" style="width:180px;"></el-input>
                                     <img v-bind:src="imgCode" alt="" class="imgCode" @click="imgCodeClick()">
                                 </el-form-item>
                                 <el-form-item class="pt5">
-                                    <el-button class="submitBtn" type="primary" @click="submitForm('ruleForm')">找回密码</el-button>
+                                    <el-button class="submitBtn" type="primary" @click="submitFormEmail('ruleForm')">找回密码</el-button>
                                 </el-form-item>
                                 <div class="btm-p clearfix">
                                     <div class="fl">已有账号<a href="#/Login">登录</a></div>
@@ -28,8 +28,8 @@
                         </el-tab-pane>
                         <el-tab-pane label="通过绑定手机找回" name="second">
                             <el-form :label-position="labelPosition" label-width="120px" :model="ForgetPhone" :rules="rulesForgetPhone" ref="ForgetPhone">
-                                <el-form-item label="国家：">
-                                    <el-input v-model="ForgetPhone.state"></el-input>
+                                <el-form-item label="国家：" prop="country">
+                                    <inputCountry :width='200' v-on:listenToChildEvent="inputCountry"/>
                                 </el-form-item>
                                 <el-form-item label="手机号：">
                                     <el-input v-model="ForgetPhone.phone"></el-input>
@@ -39,13 +39,13 @@
                                     <a href="javascript:;" class="code" @click="phoneCodeClick()">{{phoneCode}}</a>
                                 </el-form-item>
                                 <el-form-item label="设置新登录密码：">
-                                    <el-input v-model="ForgetPhone.psw"></el-input>
+                                    <el-input type="password" v-model="ForgetPhone.psw"></el-input>
                                 </el-form-item>
                                 <el-form-item label="确认新登录密码：">
-                                    <el-input v-model="ForgetPhone.checkPsw"></el-input>
+                                    <el-input type="password" v-model="ForgetPhone.checkPsw"></el-input>
                                 </el-form-item>
                                 <el-form-item class="pt5">
-                                    <el-button class="submitBtn" type="primary" @click="submitForm('ruleForm')">找回密码</el-button>
+                                    <el-button class="submitBtn" type="primary" @click="submitFormPhone('ruleForm')">找回密码</el-button>
                                 </el-form-item>
                                 <div class="btm-p clearfix">
                                     <div class="fl">已有账号<a href="#/Login">登录</a></div>
@@ -64,9 +64,10 @@
 <script>
     import Header from '@/components/Header'
     import Footer from '@/components/Footer'
+    import inputCountry from '@/components/inputCountry'
     export default {
         name: 'forget',
-        components: {Header,Footer},
+        components: {Header,Footer,inputCountry},
         data() {
             var checkImgCode = (rule, value, callback) => {
                 if (value === '') {
@@ -158,7 +159,8 @@
                 phoneCode:'获取短信验证码',
                 formForget: {
                     email: '',
-                    code:''
+                    value:'',
+                    captchaL:''
                 },
                 rulesForget:{
                     email: [
@@ -170,7 +172,7 @@
                     ],
                 },
                 ForgetPhone:{
-                    state:'',
+                    country:'',
                     phone:'',
                     msgCode:'',
                     psw:'',
@@ -195,25 +197,45 @@
             
         },
         created(){
-            // this.$store.dispatch("loginFailure")
+            this.__captcha__get();
         },
         methods: {
+            inputCountry:function(data){
+                this.ForgetPhone.country = data;
+            },
             imgCodeClick() {
-                this.random = Math.random();
-                this.imgCode = '/code/generator?randoms='+this.random;
+                this.__captcha__get();
+            },
+
+            //获取图片验证码
+            __captcha__get:function(){
+                let _this = this;
+                this.$api.__captcha__get({},
+                    (msg) => {
+                        console.log('获取图片验证码',msg);
+                        _this.imgCode = msg.url;
+                        _this.formForget.captcha = msg.captcha;
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
             },
             phoneCodeClick(){
                 let time = 60;
                 let _this = this;
-                if(!this.$filter.phone(this.ruleRegister.telephone)) {
+                if(!this.$filter.phone(this.ForgetPhone.phone)) {
                     this.$message.error({
                         message: '请输入正确手机号'
                     });
                     return false;
                 }
-                var param = {telephone:this.ruleRegister.telephone}
-                this.$api.generatorSmsCode({param},
-                    () => {
+                var param = {phone:this.ForgetPhone.phone}
+                this.$api.__sms__get(param,
+                    (msg) => {
+                        console.log(msg);
                         let time = 60;
                         _this.phoneCode = time;
                         let timeOut = setInterval(function(){
@@ -232,20 +254,64 @@
                     }
                 );
             },
+            submitFormEmail(){
+                let _this = this;
+                this.$api.__email__password__change(this.formForget,
+                    (msg) => {
+                        console.log('邮箱找回成功',msg);
+                        if(msg.error){
+                            this.$message.error({
+                                message: msg.error
+                            });
+                        }else{
+                            console.log('邮箱找回成功',msg);
+                            this.$message.success({
+                                message: '邮箱找回成功!快去邮箱里面充值密码吧！'
+                            });
+                        }
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
+            },
+            submitFormPhone(){
+                let _this = this;
+                let param = {
+                    phone : this.ForgetPhone.phone,
+                    code : this.ForgetPhone.msgCode,
+                    password:this.ForgetPhone.psw,
+                };
+                this.$api.__user__password__update__phone(param,
+                    (msg) => {
+                        console.log('密码找回成功',msg);
+                        this.$message.success({
+                            message: '密码找回成功!'
+                        });
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
+            },
             handleClick(tab, event) {
                 var _this = this;
-                if(tab.label==='注册'){
+                if(tab.label==='通过注册邮箱找回'){
                     this.imgCodeClick();
                     document.onkeyup = function(event){
                         if(event.keyCode==13) {
-                            _this.Register('ruleRegister');
+                            _this.submitFormEmail('formForget');
                         };
                     };
 
                 }else{
                     document.onkeyup = function(event){
                         if(event.keyCode==13) {
-                            _this.submitForm('ruleForm');
+                            _this.submitFormPhone('ForgetPhone');
                         };
                     };
                 }

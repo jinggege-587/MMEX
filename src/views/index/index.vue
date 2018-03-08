@@ -28,6 +28,8 @@
             <div class="indexInfo clearfix">
                 <div class="indexLeft fl">
                     <div class="zxt">
+                        <!-- <v-html-panel :url.asyc="kLine"></v-html-panel> -->
+                        <!-- <iframe class="chart_kline" style="border:1px solid #ddd;width: 660px; height: 410px;" :src="kLine"></iframe> -->
                         <img src="@/assets/img/img9.jpg" alt="">
                     </div>
                     <div class="my_coin">
@@ -303,12 +305,13 @@
 <script>
     import Head from '@/components/Head'
     import Foot from '@/components/Foot'
+    
     export default {
         name: 'index',
         components: {Head,Foot},
         data() {
             return {
-                msg: '',
+                kLine: '',
                 data1:'16411.00',
                 data2:'105665.0545',
                 data3:'17997.00',
@@ -357,10 +360,29 @@
             }
             
         },
-        created(){
-            
+        mounted () {
+            this.kLine = './k.html';
         },
-        methods: {}
+        created(){
+            this.__trade__chart();
+        },
+        methods: {
+            /* 获取某种币种绘制K线图的数据 */
+            __trade__chart(){
+                let _this = this;
+                this.$api.__trade__chart(this.formForget,
+                    (msg) => {
+                        console.log('获取K线成功',msg);
+                        
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
+            }
+        }
     }
 </script>
 

@@ -87,6 +87,36 @@ export const __sms__get = (phone, success, failure) => {
   ajax(conf, success, failure)
 }
 
+/* 邮箱找回密码 */
+export const __email__password__change = (param, success, failure) => {
+  let conf = {
+    url: '/public/__email__password__change',
+    method: 'get',
+    params: param
+  }
+  ajax(conf, success, failure)
+}
+
+/* 手机修改密码 */
+export const __user__password__update__phone = (param, success, failure) => {
+  let conf = {
+    url: '/public/__user__password__update__phone',
+    method: 'get',
+    params: param
+  }
+  ajax(conf, success, failure)
+}
+
+/* 获取某种币种绘制K线图的数据 */
+export const __trade__chart = (param, success, failure) => {
+  let conf = {
+    url: '/public/__trade__chart',
+    method: 'get',
+    params: param
+  }
+  ajax(conf, success, failure)
+}
+
 // 统一处理返回数据
 export const allHandle = {
     handleSuccess (res, success, failure) {

@@ -11,4 +11,8 @@ export const getUser = state => {
     return isEmptyObject(state.user.user)
 }
 
+// export const auth_server = auth_server => {
+//     return auth_server;
+// }
+
 

@@ -27,7 +27,7 @@
                                             :value="item.value">
                                             </el-option>
                                         </el-select>
-                                        <span class="sublits">提交</span>
+                                        <span class="sublits" @click="submits()">提交</span>
                                     </template>
                                 </div>
                             </div>
@@ -47,36 +47,40 @@
                                     width="95">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="style"
                                     label="类型"
                                     width="70">
+                                    <template slot-scope="scope">
+                                        <div v-if="scope.row.style=='买入'"><span class="yesColor">{{scope.row.style}}</span></div>
+                                        <div v-else><span class="noColor">{{scope.row.style}}</span></div>
+                                    </template>
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="deleNum"
                                     label="委托数量"
                                     width="100">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="price"
                                     label="委托价格"
                                     width="90">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="cjNum"
                                     label="成交数量"
                                     width="90">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="noCj"
                                     label="尚未成交"
                                     width="90">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="name"
+                                    prop="status"
                                     label="状态">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="address"
+                                    prop="oper"
                                     label="操作">
                                 </el-table-column>
                             </el-table>
@@ -98,17 +102,53 @@
         data() {
             return {
                 msg: '',
-                value1:'比特币',
-                value2:'未成交',
-                options1:[{value: '比特币',label: '比特币'},{value: 'CNET',label: 'CNET'},{value: 'CK.USD',label: 'CK.USD'},{value: 'ETH',label: 'ETH'}],
-                options2:[{value: '未成交',label: '未成交'},{value: '部分成交',label: '部分成交'},{value: '已成交',label: '已成交'},{value: '已撤销',label: '已撤销'},]
+                tableData:[],
+                value1:'BTC',
+                value2:'1',
+                options1:[{value: 'BTC',label: '比特币'},{value: 'CNET',label: 'CNET'},{value: 'CKUSD',label: 'CK.USD'},{value: 'ETH',label: 'ETH'}],
+                options2:[{value: '0',label: '全部'},{value: '1',label: '未全部成交'},{value: '2',label: '已全部成交'}]
             }
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function(){
+                _this.submits();
+            });
         },
-        methods: {}
+        methods: {
+            submits(){
+                /* 
+                    // 币种，不传为所有币种
+                    g: 'BTC',
+                    // 状态{ 0: 全部, 1:未全部成交， 2:已全部成交}
+                    s: 1
+                */
+                let param = {
+                    g:this.value1,
+                    s:this.value2
+                }
+                let status = { 0: '全部', 1:'未全部成交',2:'已全部成交'};
+                status = status[param.s];
+                this.auth_server = window.auth_server;
+                this.auth_server.emit('msg', { path: '/account/orders', body: param }, (msg) => {
+                    console.log('查询委托记录',JSON.stringify(msg));
+                    if(msg.error){
+                        this.$message.error({
+                            message: msg.error
+                        });
+                    }else{
+                       let data = msg.body;
+                       let tableData = [];
+                       data.forEach(element => {
+                           ['订单编号','委托时间', '币种/市场', '类型(买入/卖出)', '委托数量', '委托价格', '成交数量', '尚未成交数量']
+                           tableData.push({orderNum:element[0],date:element[1],name:element[2],style:element[3],deleNum:element[4],price:element[5],cjNum:element[6],NoCj:element[7],status:status});
+                       });
+                       this.tableData = tableData;
+                    }
+                });
+            }
+        }
     }
 </script>
 

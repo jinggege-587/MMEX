@@ -6,3 +6,6 @@ export const loginSuccess = ({commit},data) => {
 export const loginFailure = ({commit}) => {
     return commit(types.LOGIN_FAILURE)
 }
+export const auth = ({commit},data) => {
+    return commit('AUTH')
+}

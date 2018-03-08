@@ -21,6 +21,23 @@ Vue.filter('trim', function (text) {
     ( text + "" ).replace( rtrim, "" );
 })
 
+Vue.filter('auth', function(cb){
+  if(!localStorage.mc)return false;
+  let host = localStorage.mc,jwt = localStorage.jwt;
+  let auth_server = require('socket.io-client')(host);
+  window.auth_server = auth_server;
+  auth_server.emit('user', { path: '/user/login', body: {jwt:jwt} }, (msg) => {
+      console.log('登录成功！',msg);
+      if(msg.error){
+          this.$message.error({
+              message: msg.error
+          });
+      }else{
+          cb && cb(msg.body);
+      }
+  });
+});
+
 // 是否是手机号
 Vue.filter('phone', function (value) {
   return /^[1][3,4,5,8,7,9][0-9]{9}$/.test(value)
@@ -30,5 +47,6 @@ Vue.filter('phone', function (value) {
 Vue.prototype.$filter = {
   date: Vue.filter('date'),
   trim: Vue.filter('trim'),
-  phone: Vue.filter('phone')
+  phone: Vue.filter('phone'),
+  auth: Vue.filter('auth')
 }

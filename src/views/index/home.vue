@@ -17,6 +17,38 @@
             </div>
         </div>
         <div class="banner">
+            <div class="w1200 header clearfix">
+                <div class="logo fl">
+                    <img src="@/assets/img/logo.png" alt="">
+                </div>
+                <div class="fl menuTop">
+                    <ul>
+                        <li><a href="#/home" class="active">交易中心</a></li>
+                        <li><a href="#/dynamic">公告中心</a></li>
+                        <li><a href="#/user_index">我的账户</a></li>
+                        <!-- <li class="icon">
+                            <a href="javascript:;">我的账户</a>
+                            <dl>
+                                <dt><a href="#/user_index/">账户资产</a></dt>
+                                <dt><a href="#/record">充提记录</a></dt>
+                                <dt><a href="#/delegation/">委托管理</a></dt>
+                                <dt><a href="#/my_order/">我的成交</a></dt>
+                                <dt><a href="#/securitys/">安全中心</a></dt>
+                                <dt><a href="#/realName/">实名认证</a></dt>
+                                <dt><a href="#/affirm/">双重认证</a></dt>
+                                <dt><a href="#/updatePsw/">修改密码</a></dt>
+                                <dt><a href="#/syslist/">系统消息</a></dt>
+                            </dl>
+                        </li> -->
+                        <li><a href="#/dynamic">最新活动</a></li>
+                    </ul>
+                </div>
+                <div class="fr login_rgeise clearfix">
+                    <span class="fl"><a href="#/login">登录</a></span>
+                    <span class="center"></span>
+                    <span class="fr"><a href="#/register">注册</a></span>
+                </div>
+            </div>
             <div class="block">
                 <el-carousel height="500px">
                 <el-carousel-item v-for="item in itemList" :key="item">
@@ -166,6 +198,7 @@
     }
     .banner{
         background: #000000;
+        position: relative;
         .block{
             width: 1920px;
             position: relative;
@@ -173,6 +206,93 @@
             margin-left: -960px;
         }
         
+    }
+    .header{
+        position: absolute;
+        top: 0px;
+        z-index: 9999;
+        left: 50%;
+        margin-left: -600px;
+		height: 58px;
+		line-height: 58px;
+		.logo{
+			height: 58px;
+			img{
+				padding: 10px 0;
+			}
+        }
+        .menuTop{
+            margin-left: 120px;
+            ul{
+                li{
+                    float: left;
+                    width: 100px;
+                    a{
+                        color: #fff;
+                        &.active{
+                            border-bottom: 2px solid #ffffff;
+                        }
+                    }
+                    &.icon{
+                        background: url(../../assets/img/icon5.png) no-repeat right;
+                        position: relative;
+                        dl{
+                            display: none;
+                            position: absolute;
+                            z-index: 9;
+                            background: #fff;
+                            top: 30px;
+                            left: 12px;
+                            border: 1px solid #eaeaea;
+                            dt{
+                                width: 100px;
+                                a{
+                                    height: 26px;
+                                    line-height: 26px;
+                                    font-size: 12px;
+                                    width: 70px;
+                                    text-align: center;
+                                    display: block;
+                                }
+                                &:hover{
+                                    background: #3e868f;
+                                    a{
+                                        color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                        &:hover{
+                            dl{
+                                display: block;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .login_rgeise{
+            height: 30px;
+            width: 125px;
+            border: 1px solid #fff;
+            border-radius: 15px;
+            margin-top: 15px;
+            span{
+                line-height: 30px;
+                text-align: center;
+                width: 62px;
+                a{
+                    color: #fff;
+                }
+            }
+            .center{
+                float: left;
+                width: 1px;
+                height: 13px;
+                margin-top: 9px;
+                background: #ffffff;
+            }
+        }
     }
     .home{
         .notice{

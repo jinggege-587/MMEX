@@ -218,7 +218,8 @@
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth();
         },
         methods: {
             nextOne:function(formName){

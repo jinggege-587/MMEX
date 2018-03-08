@@ -11,18 +11,18 @@
                     </div>
                     <div class="ybc_hezi" style="height:260px">
                         <p>
-                            <el-checkbox label="异地登录" name="type"></el-checkbox>
+                            <el-checkbox label="异地登录" v-model="sms" name="type"></el-checkbox>
                         </p>
                         <p style="margin-left: 47px; margin-top: 15px;font-size:12px;">在登录时，若系统检测您的IP地址发生变化时会进行短信验证</p>
 
                         <div id="emailShow" style="margin-top:60px;">
                         <p style="margin-left: 30px; margin-top: 20px; font-size: 14px;color: #4A5F78;">
-                            <el-checkbox label="异地登录邮件提醒" name="type"></el-checkbox>
+                            <el-checkbox label="异地登录邮件提醒" v-model="email" name="type"></el-checkbox>
                         </p>
                         <p style="margin-left: 47px; margin-top: 15px;font-size:12px;color:red">在开启异地登录之后，若系统检测到您的IP地址发生变化会给您绑定的邮箱发送IP变化邮件</p>
                         </div>
                     </div>
-                    <div class="ybc_text"><input id="ybc_click" type="button" value="保存" class="ybc_next"></div>
+                    <div class="ybc_text"><input id="ybc_click" type="button" @click="security" value="保存" class="ybc_next"></div>
                 </div>
             </div>
         </div>
@@ -38,14 +38,35 @@
         components: {Head,Foot,Menu},
         data() {
             return {
-                msg: ''
+                msg: '',
+                sms:false,
+                email:false,
             }
             
         },
         created(){
             
         },
-        methods: {}
+        methods: {
+            security(){
+                let host = localStorage.host;
+                let param = {
+                    sms:this.sms,
+                    email:this.email
+                }
+                this.auth_server = require('socket.io-client')(host);
+                this.auth_server.emit('msg', { path: '/user/security/update', body: param }, (msg) => {
+                    console.log('设置安全级别',msg);
+                    if(msg.error){
+                        this.$message.error({
+                            message: msg.error
+                        });
+                    }else{
+                    //    msg.body
+                    }
+                });
+            }
+        }
     }
 </script>
 

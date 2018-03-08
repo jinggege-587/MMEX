@@ -47,6 +47,7 @@
 <script>
     import Header from '@/components/Header'
     import Footer from '@/components/Footer'
+    import { mapState,mapActions } from 'vuex'
     export default {
         name: 'login',
         components: {Header,Footer},
@@ -76,25 +77,39 @@
             }
         },
         created(){
+            
             // this.$store.dispatch("loginFailure")
             
 
         },
+        computed:{
+            // ...mapState({
+            //     auth_server(state){
+            //         return this.auth_server
+            //     }
+            // })
+        },
         methods: {
+            ...mapActions([
+                // 'auth'
+            ]),
             submitForm:function(formName){
-                debugger
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.login();
+                        console.log(this.ruleForm);
+                        this.auth(this.ruleForm);
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
             },
-            login:function(){
+            login:function(msg){
                 var _this = this;
-                this.$socket.emit('auth', { path: '/user/login', body: {username:this.ruleForm.username,password:this.ruleForm.password} }, (msg) => {
+                localStorage.host = msg.mc;
+                this.auth_server = require('socket.io-client')(msg.mc);
+                window.auth_server = this.auth_server;
+                this.auth_server.emit('user', { path: '/user/login', body: {jwt:msg.jwt} }, (msg) => {
                     console.log('登录成功！',msg);
                     if(msg.error){
                         this.$message.error({
@@ -102,6 +117,21 @@
                         });
                     }else{
                         this.$router.push({path: '/index'})
+                    }
+                });
+            },
+            auth:function(){
+                var _this = this;
+                this.$socket.emit('auth', { path: '/user/login', body: {username:this.ruleForm.username,password:this.ruleForm.password} }, (msg) => {
+                    console.log('登录授权成功！',msg);
+                    if(msg.error){
+                        this.$message.error({
+                            message: msg.error
+                        });
+                    }else{
+                        this.login(msg.body);
+                        localStorage.mc = msg.body.mc;
+                        localStorage.jwt = msg.body.jwt;
                     }
                 });
             },
@@ -163,7 +193,6 @@
                         this.auth_server = require('socket.io-client')(this.host);
                         this.auth_server.on('connect', () => {
                             jwt.sign(user, 'lingxi', { expiresIn: '7d' }, (err, token) => {
-                                debugger
                                 this.auth_server.emit('auth', { path: '/user/login', body: { jwt: token } }, (msg) => {
                                     console.log(msg,2);
                                     this.login(msg.body);

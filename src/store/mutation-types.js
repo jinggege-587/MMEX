@@ -2,4 +2,6 @@
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 //登录失败
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
+//授权
+export const AUTH = 'AUTH'
 

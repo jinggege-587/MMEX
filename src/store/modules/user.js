@@ -2,19 +2,14 @@ import * as types from '../mutation-types'
 
 const state = {
     user:{},
+    // auth_server:''
 }
 
-// mutations
-const mutations = {
-    [types.LOGIN_SUCCESS] (state,data) {
-        state.user = Object.assign({},state.user,data)
-    },
-    [types.LOGIN_FAILURE] (state) {
-        state.user = {}
-    },
+let action = {
+    
 }
 
 export default {
     state,
-    mutations
+    action
 }

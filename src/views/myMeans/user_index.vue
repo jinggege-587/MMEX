@@ -44,9 +44,8 @@
                                 prop="handle"
                                 label="操作">
                                 <template slot-scope="scope">
-                                    <a href="" style="margin-right:50px;">充币</a>
-                                    <a href="" style="margin-right:35px;">提币</a>
-                                    <a href="#/index" style="border:#00A1C6 1px solid ; width: 45px; height: 19px;font-size:11px;text-decoration:none;border-radius:2px;line-height:19px;text-align:center;display:inline-block;padding-top:1px" class="gosale">去交易</a>
+                                    <a href="" v-for="item in scope.row.handle" style="margin-right:50px;">{{item}}</a>
+                                    <!-- <a href="#/index" style="border:#00A1C6 1px solid ; width: 45px; height: 19px;font-size:11px;text-decoration:none;border-radius:2px;line-height:19px;text-align:center;display:inline-block;padding-top:1px" class="gosale">去交易</a> -->
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -61,24 +60,57 @@
     import Head from '@/components/Head'
     import Foot from '@/components/Foot'
     import Menu from '@/components/Menu'
+    import { mapState,mapActions } from 'vuex'
     export default {
         name: 'user_index',
         components: {Head,Foot,Menu},
         data() {
             return {
                 msg: '',
-                tableData:[
-                    {name:'以太坊 ETH',allNum:0,use:0,frost:0,handle:1},
-                    {name:'以太坊 ETH',allNum:0,use:0,frost:0,handle:1},
-                    {name:'以太坊 ETH',allNum:0,use:0,frost:0,handle:1},
-                ]
+                tableData:[],
             }
-            
+        },
+        computed:{
+            ...mapState({
+                authStatus(state){
+                    return state.auth
+                }
+            })
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(
+                function(){
+                    _this.balance();
+                }
+            );
+            // 
         },
-        methods: {}
+        methods: {
+            ...mapActions([
+                'auth'
+            ]),
+            balance(){
+                this.auth_server = window.auth_server;
+                this.auth_server.emit('msg', { path: '/account/balance', body: {} }, (msg) => {
+                    console.log('查询当前资产状态',JSON.stringify(msg));
+                    if(msg.error){
+                        this.$message.error({
+                            message: msg.error
+                        });
+                    }else{
+                       let data = msg.body;
+                       let tableData = [];
+                       data.forEach(element => {
+                        //    let a = element[4],b=[];
+                        //    b.push(a)
+                           tableData.push({name:element[0],allNum:element[1],use:element[2],frost:element[3],handle:element[4]});
+                       });
+                       this.tableData = tableData;
+                    }
+                });
+            }
+        }
     }
 </script>
 
