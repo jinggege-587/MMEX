@@ -12,12 +12,17 @@ import '../theme/index.css'
 import VueSocketio from 'vue-socket.io';
 import socketio from 'socket.io-client';
 import * as api from '@/api/index' // 导入api接口
+import echarts from 'echarts'
+
 
 import './filter'
 
 Vue.config.productionTip = false
 Vue.use(VueSocketio, 'http://dev.auth.wanbiwang.com');
-Vue.use(ElementUI)
+Vue.use(ElementUI, echarts)
+
+Vue.prototype.$echarts = echarts
+
 Vue.prototype.$api = api // 挂载到全局，在组件里通过this.api获取
 
 /* eslint-disable no-new */
@@ -44,6 +49,7 @@ api.allHandle.handleSuccess = function (data, success, failure) {
 
 // 处理ajax最后的异常
 api.allHandle.handleCatch = function (err) {
+  debugger
   if (err.toString().indexOf('404')) {
     vm.$messageBox({
       title: '404',

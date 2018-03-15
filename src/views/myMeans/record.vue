@@ -1,6 +1,6 @@
 <template>
     <div class="record-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="record w1000">
             <div class="main_box clearfix">
                 <Menu :num='1'></Menu>
@@ -123,7 +123,7 @@
         components: {Head,Foot,Menu},
         data() {
             return {
-                msg: '',
+                userName: '',
                 tableData:[
                     {id:12312,name:'eld',address:'链克兑换成玩币',num:'4900',yesNum:'12',date:'2018-02-19 14:33:42',status:'成功',other:'查看txid'},
                     {id:12312,name:'eld',address:'链克兑换成玩币',num:'4900',yesNum:'12',date:'2018-02-19 14:33:42',status:'成功',other:'查看txid'},
@@ -134,7 +134,10 @@
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
         methods: {}
     }

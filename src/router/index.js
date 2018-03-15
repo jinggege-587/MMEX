@@ -20,6 +20,7 @@ import affirm from '@/views/myMeans/affirm.vue'
 import realName from '@/views/myMeans/realName.vue'
 import syslist from '@/views/myMeans/syslist.vue'
 import updatePsw from '@/views/myMeans/updatePsw.vue'
+import updateTrade from "@/views/myMeans/updateTrade.vue"
 
 Vue.use(Router)
 
@@ -124,6 +125,11 @@ export default new Router({
       path: '/updatePsw',
       name: 'updatePsw',
       component: updatePsw
+    },
+    {
+      path: '/updateTrade',
+      name: 'updateTrade',
+      component: updateTrade
     }
   ]
 })

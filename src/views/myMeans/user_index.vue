@@ -1,6 +1,6 @@
 <template>
     <div class="user_index-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="user_index w1000">
             <div class="main_box clearfix">
                 <Menu :num="0"></Menu>
@@ -68,6 +68,7 @@
             return {
                 msg: '',
                 tableData:[],
+                userName:''
             }
         },
         computed:{
@@ -80,7 +81,8 @@
         created(){
             let _this = this;
             this.$filter.auth(
-                function(){
+                function(msg){
+                    _this.userName = msg.name;
                     _this.balance();
                 }
             );

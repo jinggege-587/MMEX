@@ -1,6 +1,6 @@
 <template>
     <div class="realName-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="realName w1000">
             <div class="main_box clearfix">
                 <Menu :num='11'></Menu>
@@ -22,18 +22,29 @@
                                 <div class="fl imgCardInfo">
                                     <el-radio label="身份证"></el-radio>
                                     <div class="imgBox clearfix">
-                                        <img src="" class="fl" alt="">
-                                        <img src="" class="fr" alt="">
+                                        <div class="img fl"><img src="@/assets/img/img10.jpg" alt=""></div>
+                                        <div class="img fr"><img src="@/assets/img/img11.jpg" alt=""></div>
                                     </div>
                                 </div>
                                 <div class="fl imgCardInfo">
                                     <el-radio label="护照"></el-radio>
                                     <div class="imgBox">
-                                        <img src="" class="fl" alt="">
-                                        <img src="" class="fr" alt="">
+                                        <div class="img fl"><img src="@/assets/img/img12.jpg" alt=""></div>
+                                        <div class="img fr"><img src="@/assets/img/img13.jpg" alt=""></div>
                                     </div>
                                 </div>
-                                
+                                <el-upload
+                                    class="upload-demo"
+                                    action="/file/upload"
+                                    :on-change="handleChange"
+                                    multiple
+                                    :limit="1"
+                                    :http-request="handleUpload"
+                                    :file-list="fileList">
+                                    <el-button size="small" type="primary" @click="handClick(1)">上传正面</el-button>
+                                    <el-button size="small" type="primary" @click="handClick(2)">上传反面</el-button>
+                                    <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
+                                    </el-upload>
                                 
                             </el-radio-group>
                         </div>
@@ -57,16 +68,72 @@
         components: {Head,Foot,Menu},
         data() {
             return {
-                msg: '',
+                userName: '',
                 input:'',
-                resource:''
+                resource:'',
+                fileList:[]
             }
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
-        methods: {}
+        methods: {
+            // 浏览文件按钮
+            handleChange(file) {
+                if(file.status == "ready"){
+                    this.fileNameLocal = file.name
+                    this.phoneSize = 0
+                    this.err = ""
+                }
+            },
+            handClick() {
+                // this.$refs.upload.clearFiles()
+            },
+            handleUpload(info) {
+                let file = info.file
+                if(!file) {
+                    return this.$message({
+                        type: 'warning',
+                        message: "请重新添加文件"
+                    })
+                }
+                const formData = new FormData();
+                let myDate = new Date()
+                // formData.append("file",file);
+                file.accountId = 'security_verify';
+                file.issue = myDate.getFullYear() +'-'+ (myDate.getMonth()+1);
+                file.token = localStorage.jwt;
+                debugger
+                this.$api.upload(file,{
+                    method:'post'
+                }, res => {
+                    console.log(res);
+                    this.phoneSize = res.phoneSize || 0
+                    this.filePath = res.filePath
+                    this.fileName = res.fileName
+                    this.uploadSize = res.uploadSize
+                    if(!res.fileName){
+                        this.err = "余额不足"
+                    }else {
+                        this.err = ""
+                    }
+                }, err => {
+                    this.$refs.upload.clearFiles()
+                    this.phoneSize = 0
+                    this.filePath = ""
+                    this.fileName = ""
+                    this.err = err.errorMessage
+                    this.$message({
+                        type: 'error',
+                        message: err.errorMessage
+                    })
+                })
+            }
+        }
     }
 </script>
 
@@ -112,17 +179,25 @@
                 .imgCardInfo{
                     margin-top: 15px;
                     width: 405px;
+                    margin-bottom: 20px;
                     .imgBox{
                         background: #faf9f6;
                         margin-left: 20px;
                         height: 175px;
                         width: 350px;
                         margin-top: 5px;
-                        img{
+                        .img{
+                            position: relative;
                             width: 160px;
                             height: 160px;
                             border: 1px dotted #ccc;
                             margin: 5px;
+                            img{
+                                position: absolute;
+                                top:50%;
+                                left:50%;
+                                transform: translate(-50%,-50%);
+                            }
                         }
                     }
                 }

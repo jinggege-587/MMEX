@@ -1,6 +1,6 @@
 <template>
     <div class="affirm-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="affirm w1000">
             <div class="main_box clearfix">
                 <Menu :num='11'></Menu>
@@ -52,13 +52,16 @@
         components: {Head,Foot,Menu},
         data() {
             return {
-                msg: '',
+                userName: '',
                 input:''
             }
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
         methods: {}
     }

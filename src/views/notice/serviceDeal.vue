@@ -1,6 +1,6 @@
 <template>
     <div class="serviceDeal-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="serviceDeal w1000">
             <img src="@/assets/img/img2.jpg" alt="">
         </div>
@@ -15,11 +15,16 @@
         components: {Head,Foot},
         data() {
             return {
-                msg: ''
+                msg: '',
+                userName:''
             }
             
         },
         created(){
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
             
         },
         methods: {}

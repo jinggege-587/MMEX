@@ -1,6 +1,6 @@
 <template>
     <div class="securitys-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="securitys w1000">
             <div class="main_box clearfix">
                 <Menu :num='6'></Menu>
@@ -41,11 +41,15 @@
                 msg: '',
                 sms:false,
                 email:false,
+                userName:''
             }
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
         methods: {
             security(){

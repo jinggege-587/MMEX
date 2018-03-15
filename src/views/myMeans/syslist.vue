@@ -1,6 +1,6 @@
 <template>
     <div class="syslist-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="syslist w1000">
             <div class="main_box clearfix">
                 <Menu :num='9'></Menu>
@@ -40,12 +40,16 @@
         data() {
             return {
                 msg: '',
+                userName:'',
                 tableData:[]
             }
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
         methods: {}
     }

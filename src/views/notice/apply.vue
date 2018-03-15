@@ -1,6 +1,6 @@
 <template>
     <div class="apply-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="apply w1000">
             <div class="applyInfo">
                 <p class="p1">上币申请</p>
@@ -28,11 +28,16 @@
         components: {Head,Foot},
         data() {
             return {
-                msg: ''
+                msg: '',
+                userName:''
             }
             
         },
         created(){
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
             
         },
         methods: {}

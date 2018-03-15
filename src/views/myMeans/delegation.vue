@@ -1,6 +1,6 @@
 <template>
     <div class="delegation-wrap flex-column">
-        <Head/>
+        <Head :userName="userName" />
         <div class="delegation w1000">
             <div class="main_box clearfix">
                 <Menu :num='3'></Menu>
@@ -105,6 +105,7 @@
                 tableData:[],
                 value1:'BTC',
                 value2:'1',
+                userName:'',
                 options1:[{value: 'BTC',label: '比特币'},{value: 'CNET',label: 'CNET'},{value: 'CKUSD',label: 'CK.USD'},{value: 'ETH',label: 'ETH'}],
                 options2:[{value: '0',label: '全部'},{value: '1',label: '未全部成交'},{value: '2',label: '已全部成交'}]
             }
@@ -112,7 +113,8 @@
         },
         created(){
             let _this = this;
-            this.$filter.auth(function(){
+            this.$filter.auth(function(msg){
+                _this.userName = msg.name;
                 _this.submits();
             });
         },

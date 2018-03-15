@@ -1,6 +1,6 @@
 <template>
     <div class="index-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="index-top">
             <div class="w1000 pt_20 clearfix">
                 <div class="fl w25 w367 clearfix">
@@ -30,7 +30,8 @@
                     <div class="zxt">
                         <!-- <v-html-panel :url.asyc="kLine"></v-html-panel> -->
                         <!-- <iframe class="chart_kline" style="border:1px solid #ddd;width: 660px; height: 410px;" :src="kLine"></iframe> -->
-                        <img src="@/assets/img/img9.jpg" alt="">
+                        <!-- <img src="@/assets/img/img9.jpg" alt=""> -->
+                        <div id="main" style="width: 660px;height:410px;"></div>
                     </div>
                     <div class="my_coin">
                         <p>我的资产：<a href="/user/login">登录</a> | <a href="/user/reg">注册</a></p>
@@ -311,6 +312,7 @@
         components: {Head,Foot},
         data() {
             return {
+                userName:'',
                 kLine: '',
                 data1:'16411.00',
                 data2:'105665.0545',
@@ -356,15 +358,16 @@
                     {style:'卖(02)',price:17849.99,num:2,other:10},
                     {style:'卖(03)',price:17849.99,num:2,other:7},
                     {style:'卖(04)',price:17849.99,num:2,other:17},
-                ]
+                ],
             }
             
         },
-        mounted () {
-            this.kLine = './k.html';
-        },
         created(){
-            this.__trade__chart();
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+                _this.__trade__chart();
+            });
         },
         methods: {
             /* 获取某种币种绘制K线图的数据 */
@@ -373,7 +376,10 @@
                 this.$api.__trade__chart(this.formForget,
                     (msg) => {
                         console.log('获取K线成功',msg);
-                        
+                        msg.forEach(element => {
+                            element[0] = new Date(element[0]);
+                        });
+                        _this.echarts(msg);
                     },
                     err => {
                         this.$message.error({
@@ -381,6 +387,161 @@
                         });
                     }
                 );
+            },
+            echarts(rawData){
+                var rawData = [[1508608800,16591.5651,3.05,6,3.05,5.24],[1508695200,11428.4,4.99,4.99,3.55,3.85],[1508781600,33006.142,3.85,4.94,3.105,3.15],[1508868000,23541.734354,3.3,3.48,2.2,2.9],[1508954400,42593.609677,2.89,3.55,2.75,3.46],[1509040800,39049.283962,3.31,3.45,2.8,3.1],[1509127200,50810.053893,3.13,3.25,2.86,3],[1509213600,43529.726823,2.86,3.19,2.86,3.19],[1509300000,153309.230881,3,3.27,2.67,3.17],[1509386400,57768.661191,3.16,3.49,2.9,2.95],[1509472800,59637.748827,2.95,3,2.61,2.88],[1509559200,47119.285999,2.75,2.88,2.69,2.75],[1509645600,79394.69287,2.76,2.83,2.63,2.74],[1509732000,151450.855968,2.74,3.8,2.69,3.1],[1509818400,120817.245578,3.1,3.58,3.02,3.3]].reverse();
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = this.$echarts.init(document.getElementById('main'));
+                function calculateMA(dayCount, data) {
+                    var result = [];
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        if (i < dayCount) {
+                            result.push('-');
+                            continue;
+                        }
+                        var sum = 0;
+                        for (var j = 0; j < dayCount; j++) {
+                            sum += data[i - j][1];
+                        }
+                        result.push(sum / dayCount);
+                    }
+                    return result;
+                }
+
+
+                var dates = rawData.map(function (item) {
+                    return item[0];
+                });
+
+                var data = rawData.map(function (item) {
+                    return [+item[1], +item[2], +item[5], +item[6]];
+                });
+                var option = {
+                    backgroundColor: '#21202D',
+                    legend: {
+                        data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30'],
+                        inactiveColor: '#777',
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            animation: false,
+                            type: 'cross',
+                            lineStyle: {
+                                color: '#376df4',
+                                width: 2,
+                                opacity: 1
+                            }
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: dates,
+                        axisLine: { lineStyle: { color: '#8392A5' } }
+                    },
+                    yAxis: {
+                        scale: true,
+                        axisLine: { lineStyle: { color: '#8392A5' } },
+                        splitLine: { show: false }
+                    },
+                    grid: {
+                        bottom: 80
+                    },
+                    dataZoom: [{
+                        textStyle: {
+                            color: '#8392A5'
+                        },
+                        handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                        handleSize: '80%',
+                        dataBackground: {
+                            areaStyle: {
+                                color: '#8392A5'
+                            },
+                            lineStyle: {
+                                opacity: 0.8,
+                                color: '#8392A5'
+                            }
+                        },
+                        handleStyle: {
+                            color: '#fff',
+                            shadowBlur: 3,
+                            shadowColor: 'rgba(0, 0, 0, 0.6)',
+                            shadowOffsetX: 2,
+                            shadowOffsetY: 2
+                        }
+                    }, {
+                        type: 'inside'
+                    }],
+                    animation: false,
+                    series: [
+                        {
+                            type: 'candlestick',
+                            name: '日K',
+                            data: data,
+                            itemStyle: {
+                                normal: {
+                                    color: '#FD1050',
+                                    color0: '#0CF49B',
+                                    borderColor: '#FD1050',
+                                    borderColor0: '#0CF49B'
+                                }
+                            }
+                        },
+                        {
+                            name: 'MA5',
+                            type: 'line',
+                            data: calculateMA(5, data),
+                            smooth: true,
+                            showSymbol: false,
+                            lineStyle: {
+                                normal: {
+                                    width: 1
+                                }
+                            }
+                        },
+                        {
+                            name: 'MA10',
+                            type: 'line',
+                            data: calculateMA(10, data),
+                            smooth: true,
+                            showSymbol: false,
+                            lineStyle: {
+                                normal: {
+                                    width: 1
+                                }
+                            }
+                        },
+                        {
+                            name: 'MA20',
+                            type: 'line',
+                            data: calculateMA(20, data),
+                            smooth: true,
+                            showSymbol: false,
+                            lineStyle: {
+                                normal: {
+                                    width: 1
+                                }
+                            }
+                        },
+                        {
+                            name: 'MA30',
+                            type: 'line',
+                            data: calculateMA(30, data),
+                            smooth: true,
+                            showSymbol: false,
+                            lineStyle: {
+                                normal: {
+                                    width: 1
+                                }
+                            }
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
             }
         }
     }

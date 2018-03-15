@@ -35,6 +35,21 @@ export const uploadImage = (data, success, failure) => {
   }
   ajax(conf, success, failure)
 }
+// 图片上传
+export const upload = (param, success, failure) => {
+  let conf = {
+    url: '/file/upload',
+    method: 'post',
+    params: param,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    transformRequest: function (data) {
+      return data
+    }
+  }
+  ajax(conf, success, failure)
+}
 
 /**
  * 登录
@@ -116,6 +131,7 @@ export const __trade__chart = (param, success, failure) => {
   }
   ajax(conf, success, failure)
 }
+
 
 // 统一处理返回数据
 export const allHandle = {

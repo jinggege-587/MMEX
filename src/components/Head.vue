@@ -51,11 +51,16 @@
 <script>
 export default {
     name: 'Head',
+    props:{
+        userName:{
+            type:String,
+            default:"userName"
+        }
+    },
     data () {
         return {
         msg: '',
         service:'service@mmex.ca',
-        userName:'12345678912@qq.com (ID:125546)'
         }
     },
     created(){
@@ -64,21 +69,6 @@ export default {
     methods:{
         backOut(){
 
-        },
-        login(){
-            let host = localStorage.mc,jwt = localStorage.jwt;
-            this.auth_server = require('socket.io-client')(host);
-            window.auth_server = this.auth_server;
-            this.auth_server.emit('user', { path: '/user/login', body: {jwt:jwt} }, (msg) => {
-                console.log('登录成功！',msg);
-                if(msg.error){
-                    this.$message.error({
-                        message: msg.error
-                    });
-                }else{
-                    this.$router.push({path: '/index'})
-                }
-            });
         }
     }
 }

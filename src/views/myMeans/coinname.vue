@@ -1,6 +1,6 @@
 <template>
     <div class="coinname-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="coinname w1000">
             <div class="main_box clearfix">
                 <Menu :num='122'></Menu>
@@ -95,7 +95,10 @@
             
         },
         created(){
-            
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
         },
         methods: {}
     }

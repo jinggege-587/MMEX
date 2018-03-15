@@ -1,6 +1,6 @@
 <template>
     <div class="dynamic-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="dynamicBox w1000">
             <div class="searBox clearfix">
                 <div class="searInfo clearfix">
@@ -72,11 +72,16 @@
                         txt:'【系统】MMEX赠送活动现在已结束并完成送币',
                         time:'2017-12-29  12:13:39'
                     }
-                ]
+                ],
+                userName:''
             }
             
         },
         created(){
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
             
         },
         methods: {}

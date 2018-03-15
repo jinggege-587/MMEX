@@ -1,6 +1,6 @@
 <template>
     <div class="payAndSell-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="payAndSell">
             <div class="payAndSellTop ">
                 <div class="w1000 clearfix">
@@ -31,11 +31,16 @@
         components: {Head,Foot},
         data() {
             return {
-                msg: ''
+                msg: '',
+                userName:''
             }
             
         },
         created(){
+            let _this = this;
+            this.$filter.auth(function (msg) {
+                _this.userName = msg.name;
+            });
             
         },
         methods: {}

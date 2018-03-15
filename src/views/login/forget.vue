@@ -76,20 +76,7 @@
                     if (!/^[0-9]{4}$/.test(value)) {
                         callback(new Error('请输入正确的图片验证码'));
                     }else{
-                        this.$ajax({
-                            url:'/code/validate',
-                            data:{
-                                randoms:this.random,
-                                value:this.ruleRegister.randoms,
-                            },
-                            async:false,
-                            success:() => {
-                                callback()
-                            },
-                            error:() => {
-                                callback(new Error('请输入正确的图片验证码'))
-                            }
-                        })
+                        callback();
                     }
                 }
             };
@@ -110,25 +97,7 @@
                     if (!/^[0-9]{6}$/.test(value)) {
                         callback(new Error('请输入正确的短信验证码'));
                     }else{
-                        if(!this.checkSmsCode){
-                            this.$ajax({
-                                url:'/code/validateSmsCode',
-                                data:{
-                                    telephone:this.ruleRegister.telephone,
-                                    code:this.ruleRegister.smsCode
-                                },
-                                async:false,
-                                success:() => {
-                                    this.checkSmsCode = true
-                                    callback()
-                                },
-                                error:() => {
-                                    callback(new Error('请输入正确的短信验证码'))
-                                }
-                            })
-                        }else {
-                            callback()
-                        }
+                        callback()
                     }
                 }
             };

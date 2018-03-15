@@ -1,6 +1,6 @@
 <template>
     <div class="delegation-wrap flex-column">
-        <Head/>
+        <Head :userName="userName"/>
         <div class="delegation w1000">
             <div class="main_box clearfix">
                 <Menu :num='4'></Menu>
@@ -88,13 +88,14 @@
     import Foot from '@/components/Foot'
     import Menu from '@/components/Menu'
     export default {
-        name: 'delegation',
+        name: 'my_order',
         components: {Head,Foot,Menu},
         data() {
             return {
                 msg: '',
                 value1:'CK.USD',
                 tableData:[],
+                userName:'',
                 value2:'未成交',
                 options1:[{value: '比特币',label: '比特币'},{value: '以太坊',label: '以太坊'},{value: '链克',label: '链克'}],
                 options2:[{value: 'CK.USD',label: 'CK.USD'},{value: 'BTC',label: 'BTC'},{value: 'ETH',label: 'ETH'}]
@@ -102,7 +103,8 @@
         },
         created(){
             let _this = this;
-            this.$filter.auth(function(){
+            this.$filter.auth(function(msg){
+                _this.userName = msg.name;
                 _this.submits();
             });
         },

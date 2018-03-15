@@ -25,9 +25,10 @@ Vue.filter('auth', function(cb){
   if(!localStorage.mc)return false;
   let host = localStorage.mc,jwt = localStorage.jwt;
   let auth_server = require('socket.io-client')(host);
+  let _this = this;
   window.auth_server = auth_server;
   auth_server.emit('user', { path: '/user/login', body: {jwt:jwt} }, (msg) => {
-      console.log('登录成功！',msg);
+      console.log('登录成功0！',msg);
       if(msg.error){
           this.$message.error({
               message: msg.error

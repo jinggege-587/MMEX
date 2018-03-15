@@ -5,53 +5,33 @@
             <div class="main_box clearfix">
                 <Menu :num='8'></Menu>
                 <div class="main_info fr">
-                    <h2 class="ybc_section_h2">修改密码</h2>
+                    <h2 class="ybc_section_h2">重置交易密码</h2>
                     <div class="listBox">
-                        <div class="tab-box clearfix">
-                            <div @click="tab(true)" :class="{on:register}" style="border-right:1px solid #e6e6e6;">修改密码</div>
-                            <div @click="tab(false)" :class="{on:!register}">修改交易密码</div>
-                        </div>
                         <div class="updateBox">
                             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="235px" class="register-ruleForm register register-ruleForm-setTrPsw" :class="{hide:!register}">
-                                <el-form-item label="登录密码：" prop="loginPsw">
-                                    <el-input type="password" v-model="ruleForm.loginPsw"></el-input>
+                                <el-form-item label="登录密码：" prop="loginPassword">
+                                    <el-input type="password" v-model="ruleForm.loginPassword"></el-input>
                                 </el-form-item>
-                                <el-form-item label="新密码：" prop="newPsw">
-                                    <el-input type="password" v-model="ruleForm.newPsw"></el-input>
-                                    <span class="explain">密码长度在6-20个字符之间</span>
+                                <el-form-item label="图像验证码：">
+                                    <el-input v-model="ruleForm.value" style="width:170px;"></el-input>
+                                    <img v-bind:src="imgCode" alt="" class="imgCode" @click="imgCodeClick()">
                                 </el-form-item>
-                                <el-form-item label="重复密码：" prop="checkPass">
-                                    <el-input type="password" v-model="ruleForm.checkPass"></el-input>
-                                </el-form-item>
-                                <el-form-item label="验证码: " prop="msgCode">
-                                    <el-input v-model="ruleForm.msgCode" style="width: 170px;"></el-input>
+                                <el-form-item label="手机验证码: " prop="code">
+                                    <el-input v-model="ruleForm.code" style="width: 170px;"></el-input>
                                     <a href="javascript:;" class="code" @click="phoneCodeClick()">{{phoneCode}}</a>
                                 </el-form-item>
-                                <el-form-item>
-                                    <el-button class="fl" style="width:200px;" type="primary" @click="nextOne('ruleForm')">提交</el-button>
-                                </el-form-item>
-                            </el-form>
-                            <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="235px" class="register-ruleForm register register-ruleForm-setTrPsw" :class="{hide:register}">
-                                <el-form-item label="登录密码：" prop="loginPsw">
-                                    <el-input type="password" v-model="ruleForm2.loginPsw"></el-input>
-                                </el-form-item>
-                                <el-form-item label="交易密码：" prop="loginPsw">
-                                    <el-input type="password" v-model="ruleForm2.loginPsw"></el-input>
-                                    <span class="explain"><a href=""> 忘记密码 </a></span>
-                                </el-form-item>
-                                <el-form-item label="新交易密码：" prop="newPsw">
-                                    <el-input type="password" v-model="ruleForm2.newPsw"></el-input>
+                                <el-form-item label="新交易密码：" prop="tradePassword">
+                                    <el-input type="password" v-model="ruleForm.tradePassword"></el-input>
                                     <span class="explain">密码长度在6-20个字符之间</span>
                                 </el-form-item>
                                 <el-form-item label="重复交易密码：" prop="checkPass">
-                                    <el-input type="password" v-model="ruleForm2.checkPass"></el-input>
+                                    <el-input type="password" v-model="ruleForm.checkPass"></el-input>
                                 </el-form-item>
-                                <el-form-item label="短信验证码: " prop="msgCode">
-                                    <el-input v-model="ruleForm2.msgCode" style="width: 170px;"></el-input>
-                                    <a href="javascript:;" class="code" @click="phoneCodeClick()">{{phoneCode}}</a>
+                                <el-form-item label="证件号码：" prop="checkPass">
+                                    <el-input v-model="ruleForm.id"></el-input>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button class="fl" style="width:200px;" type="primary" @click="nextTwo('ruleForm')">提交</el-button>
+                                    <el-button class="fl" style="width:200px;" type="primary" @click="nextOne('ruleForm')">提交</el-button>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -85,26 +65,7 @@
             var validatePass1 = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('请再次输入密码'));
-                } else if (value !== this.ruleForm.newPsw) {
-                    callback(new Error('两次输入密码不一致!'));
-                } else {
-                    callback();
-                }
-            };
-            var validatePass4 = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('请输入密码'));
-                } else {
-                    if (this.ruleForm2.checkPass !== '') {
-                        this.$refs.ruleForm2.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            var validatePass3 = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('请再次输入密码'));
-                } else if (value !== this.ruleForm2.newPsw) {
+                } else if (value !== this.ruleForm.tradePassword) {
                     callback(new Error('两次输入密码不一致!'));
                 } else {
                     callback();
@@ -117,19 +78,29 @@
                     if (!/^[0-9]{6}$/.test(value)) {
                         callback(new Error('请输入正确的短信验证码'));
                     }else{
-                         callback()
+                        callback()
                     }
                 }
             };
-            var checkSmsCode2 = (rule, value, callback) => {
+            var checkImgCode = (rule, value, callback) => {
                 if (value === '') {
-                    callback(new Error('请输入短信验证码'));
+                    callback(new Error('请输入图片验证码'));
                 } else {
-                    if (!/^[0-9]{6}$/.test(value)) {
-                        callback(new Error('请输入正确的短信验证码'));
+                    if (!/^[0-9]{4}$/.test(value)) {
+                        callback(new Error('请输入正确的图片验证码'));
                     }else{
-                        callback()
+                        callback();
                     }
+                }
+            };
+            var card = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入证件号码'));
+                } else {
+                    if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(value)) {
+                        callback(new Error('请输入正确的证件号码'));
+                    }
+                    callback();
                 }
             };
             return {
@@ -138,44 +109,34 @@
                 register:true,
                 checkSmsCode:false,
                 checkSmsCode2:false,
+                imgCode:'',
+                auth_server:'',
                 ruleForm: {
-                    loginPsw:'',
-                    newPsw:'',
-                    checkPass: '',
-                    msgCode:''
+                    value:'',
+                    loginPassword:'123456',
+                    tradePassword:'123456',
+                    checkPass: '123456',
+                    code:'563147',
+                    id:'411325199009115018',
+                    captcha:''
                 },
                 rules: {
-                    loginPsw:[{ required: true, message: '请输入登录密码', trigger: 'blur' }],
-                    newPsw: [
+                    loginPassword:[{ required: true, message: '请输入登录密码', trigger: 'blur' }],
+                    tradePassword: [
                         { validator: validatePass2, trigger: 'blur' },
                         { min: 6, max: 20, message: '密码长度6-20位', trigger: 'blur' }
                     ],
                     checkPass: [
                         { validator: validatePass1, trigger: 'blur' }
                     ],
-                    msgCode: [
+                    code: [
                         { validator: checkSmsCode, trigger: 'blur' }
-                    ]
-                },
-                ruleForm2: {
-                    loginPsw:'',
-                    dealPsw:'',
-                    newPsw:'',
-                    checkPass: '',
-                    msgCode:''
-                },
-                rules2: {
-                    loginPsw:[{ required: true, message: '请输入登录密码', trigger: 'blur' }],
-                    dealPsw:[{ required: true, message: '请输入交易密码', trigger: 'blur' }],
-                    newPsw: [
-                        { validator: validatePass4, trigger: 'blur' },
-                        { min: 6, max: 20, message: '密码长度6-20位', trigger: 'blur' }
                     ],
-                    checkPass: [
-                        { validator: validatePass3, trigger: 'blur' }
+                    value: [
+                        { validator: checkImgCode, trigger: 'blur' }
                     ],
-                    msgCode: [
-                        { validator: checkSmsCode2, trigger: 'blur' }
+                    id: [
+                        { validator: card, trigger: 'blur' }
                     ]
                 },
                 userName:''
@@ -186,10 +147,32 @@
             let _this = this;
             this.$filter.auth(function (msg) {
                 _this.userName = msg.name;
+                _this.__captcha__get();
             });
         },
         methods: {
+            imgCodeClick() {
+                this.__captcha__get();
+            },
+
+            //获取图片验证码
+            __captcha__get:function(){
+                let _this = this;
+                this.$api.__captcha__get({},
+                    (msg) => {
+                        console.log('获取图片验证码',msg);
+                        _this.imgCode = msg.url;
+                        _this.ruleForm.captcha = msg.captcha;
+                    },
+                    err => {
+                        this.$message.error({
+                            message: err.error
+                        });
+                    }
+                );
+            },
             nextOne:function(formName){
+
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         let {id,code,captcha,value,loginPassword,tradePassword} = this.ruleForm;
@@ -205,17 +188,16 @@
                                 });
                             }
                         });
-                    } else {
+                    }else{
                         console.log('error submit!!');
                         return false;
                     }
-                });
+                })
             },
-            // /sms/get  无号码获取验证码
-            phoneCodeClick:function(){
+            phoneCodeClick(){
+                let time = 60;
                 let _this = this;
-                this.auth_server = window.auth_server;
-                this.auth_server.emit('msg', { path: '/sms/get', body: {} }, (msg) => {
+                window.auth_server.emit('msg', { path: '/sms/get', body: {} }, (msg) => {
                     console.log('无号码获取验证码',JSON.stringify(msg));
                     if(msg.error){
                         this.$message.error({
@@ -234,13 +216,6 @@
                         },1000);
                     }
                 });
-            },
-            tab:function(valid){
-                if(valid){
-                    this.register=true;
-                }else{
-                    this.register=false;
-                }
             }
         }
     }
@@ -299,6 +274,13 @@
                     text-align: center;
                     font-size: 12px;
                     // margin-top: 5px;
+                }
+                .imgCode{
+                    width: 120px;
+                    height: 38px;
+                    line-height: 38px;
+                    float: left;
+                    margin-left: 10px;
                 }
             }
         }
